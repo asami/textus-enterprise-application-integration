@@ -169,3 +169,42 @@ Google Workspace / NotebookLM
 ```
 
 TKL is intentionally isolated from Google-specific physical access. TEAI presents a provider-neutral Knowledge Candidate/event contract to TKL while OpenClaw handles suitable Google Workspace/SaaS interaction on the external edge.
+
+## Bidirectional OpenClaw integration
+
+OpenClaw is a **bidirectional Intelligent Integration Edge** for TEAI, not only an ingress connector.
+
+```text
+                    OpenClaw
+                Intelligent Edge
+                /              \
+           ingress            egress
+              |                  ^
+              +------ TEAI ------+
+                       |
+                      CNCF
+                       |
+                    Workflow
+```
+
+TEAI/OpenClaw interaction has four primary patterns:
+
+1. **EVENT** — OpenClaw -> TEAI. An event or externally observed condition enters the enterprise integration runtime.
+2. **INVOCATION** — TEAI -> OpenClaw. TEAI requests a concrete external tool/service operation whose intent and operation are already determined by the Textus side.
+3. **DELEGATION** — TEAI -> OpenClaw. TEAI delegates a goal and allows OpenClaw/agents/tools to determine how to achieve it.
+4. **CONTINUATION** — OpenClaw -> TEAI. A delegated activity completes/fails/cancels and returns the normalized result needed to continue the CNCF Workflow.
+
+INVOCATION and DELEGATION are intentionally distinct. Invocation is orchestration of a known external capability; delegation transfers responsibility for achieving a goal across a continuation boundary.
+
+Example:
+
+```text
+INVOCATION:
+  "Retrieve file X from Google Drive"
+
+DELEGATION:
+  "Find relevant project material for this KnowledgeCandidate
+   and return grounded supplementary information"
+```
+
+This distinction should be reflected in TEAI contracts and mapped consistently to CNCF ORCHESTRATION / CONTINUATION semantics.
