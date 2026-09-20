@@ -134,3 +134,38 @@ The default architectural rule is: **do not duplicate an external-service connec
 For example, a CNCF Workflow may delegate the goal "obtain approval from the responsible person" without knowing whether OpenClaw uses Slack, email, another collaboration service, or additional AI interaction. The continuation result returns the enterprise-level outcome to the workflow.
 
 This keeps provider-specific interaction at the edge while preserving deterministic enterprise control in TEAI/CNCF.
+
+## Physical integration responsibility
+
+Physical integration with external systems is a TEAI responsibility. TEAI supports two implementation paths:
+
+```text
+External System
+  |
+  +-- deterministic integration --> TEAI Endpoint
+  |
+  +-- agent/tool-mediated SaaS --> OpenClaw --> TEAI
+```
+
+OpenClaw is therefore an integration-edge implementation used by TEAI, not a replacement for TEAI's enterprise integration semantics. OpenClaw can absorb provider-specific APIs, authentication/tooling details, conversational interaction and SaaS connector differences. TEAI retains endpoint/event semantics, Integration Binding, policy, correlation, delivery guarantees, audit/provenance, Job/Workflow association and Continuation Protocol integration.
+
+### Knowledge Lake reference integration
+
+The Google Workspace Knowledge Lake is a representative use case:
+
+```text
+Google Workspace / NotebookLM
+          |
+       OpenClaw
+  physical/tool access
+          |
+         TEAI
+  integration boundary
+          |
+         TKL
+ KnowledgeCandidate ingestion
+          |
+     Textus World
+```
+
+TKL is intentionally isolated from Google-specific physical access. TEAI presents a provider-neutral Knowledge Candidate/event contract to TKL while OpenClaw handles suitable Google Workspace/SaaS interaction on the external edge.
