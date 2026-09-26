@@ -122,3 +122,41 @@ OpenClaw
 OpenClaw may select and operate Codex or a local LLM within the execution responsibility delegated through the protocol. TEAI may also gain direct Codex or local-LLM routes where useful, but those optional routes do not change the primary authority split.
 
 This supersedes interpretations in which OpenClaw is the top-level logical routing authority or in which TEAI directly drives every physical worker invocation. Continuation Protocol deliberately allows TEAI/Textus to retain semantic authority while yielding physical control back to OpenClaw between decisions.
+
+## Cost-aware Continuation Dispatcher
+
+AI execution cost is a first-class architectural concern for Continuation-based orchestration.
+
+A Continuation response often does not itself require a frontier model. OpenClaw may need only to interpret the returned request/result, identify the appropriate execution/thinking logic, and invoke that logic. A small local model is therefore a candidate **Continuation Dispatcher**.
+
+The dispatcher is part of OpenClaw's physical orchestration layer, not TEAI/Textus logical authority.
+
+```text
+TEAI / Textus
+  logical authority
+       |
+       | Continuation response
+       v
+OpenClaw
+  physical orchestration
+       |
+       v
+Local dispatcher model
+       |
+       +-- deterministic operation
+       +-- lightweight local judgment -> local LLM
+       +-- implementation/review/high reasoning -> Codex
+       +-- external integration -> OpenClaw integration logic
+       +-- human approval -> yield
+       +-- next protocol call -> TEAI/Textus
+```
+
+The local dispatcher should normally solve a bounded classification/selection problem rather than perform the expensive work itself. Inputs should expose explicit state, requested goal/action, ReasoningLevel/Presentation, allowed execution mechanisms, and relevant observations. Output should be schema-constrained, for example an executor/logic/reasoning selection.
+
+Routing must combine deterministic constraints with model judgment. The dispatcher must not invent protocol transitions or acquire workflow authority. Candidate selections remain subject to validation/admission, and ambiguous, unsupported, high-risk, or high-reasoning work can escalate to Codex.
+
+The initial Mac mini experiment shows Qwen 3.5 4B through native Ollama is viable enough to evaluate for this dispatcher role. This is a hypothesis to test with real Continuation fixtures, not a permanent model choice.
+
+The cost objective is to avoid spending Codex/frontier-model capacity merely to decide *which* deterministic operation, local reasoning routine, Codex task, integration action, or human continuation should run next. Frontier-model calls should be reserved for work whose semantic difficulty warrants them.
+
+Future evaluation should compare local-dispatch and Codex decisions over representative Continuation fixtures, including correctness, escalation behavior, latency, and AI cost.
