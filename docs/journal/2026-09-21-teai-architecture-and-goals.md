@@ -92,3 +92,33 @@ The first implementation should validate two complementary scenarios:
 - AI-native EAI: CNCF Workflow -> Continuation Protocol -> OpenClaw -> result -> workflow continuation.
 
 Detailed protocol DTOs, endpoint SPI, delivery guarantees, and CNCF binding contracts should be derived from these scenarios rather than designing a large generic EAI framework first.
+
+## Continuation IoC: logical authority and physical orchestration
+
+OpenClaw integration uses the Continuation Protocol as an inversion-of-control boundary.
+
+The authority split is intentional:
+
+- **TEAI / Textus is the logical control authority.** It owns integration meaning, workflow/job state, routing policy, admission decisions, auditability, and the semantic decision about what should happen next.
+- **OpenClaw is the physical orchestration authority for work delegated to it.** It owns the active execution loop: invoking TEAI/Textus, receiving a Continuation, executing the requested external/AI work, returning results, and advancing through subsequent Continuations.
+- OpenClaw is therefore not merely a passive adapter, but it is also not the owner of the business/workflow semantics.
+
+The normal AI execution shape is:
+
+```text
+TEAI / Textus
+ logical authority
+       ^
+       | Continuation Protocol
+       v
+OpenClaw
+ physical orchestration
+   |            |
+   v            v
+ Codex      Local LLM
+             (Ollama)
+```
+
+OpenClaw may select and operate Codex or a local LLM within the execution responsibility delegated through the protocol. TEAI may also gain direct Codex or local-LLM routes where useful, but those optional routes do not change the primary authority split.
+
+This supersedes interpretations in which OpenClaw is the top-level logical routing authority or in which TEAI directly drives every physical worker invocation. Continuation Protocol deliberately allows TEAI/Textus to retain semantic authority while yielding physical control back to OpenClaw between decisions.
