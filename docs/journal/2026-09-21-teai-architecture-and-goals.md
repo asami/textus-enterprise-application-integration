@@ -160,3 +160,37 @@ The initial Mac mini experiment shows Qwen 3.5 4B through native Ollama is viabl
 The cost objective is to avoid spending Codex/frontier-model capacity merely to decide *which* deterministic operation, local reasoning routine, Codex task, integration action, or human continuation should run next. Frontier-model calls should be reserved for work whose semantic difficulty warrants them.
 
 Future evaluation should compare local-dispatch and Codex decisions over representative Continuation fixtures, including correctness, escalation behavior, latency, and AI cost.
+
+## AI Cost Optimization Principle: Program > Local LLM > Frontier AI
+
+TEAI/OpenClaw should minimize the use of expensive high-capability generative AI for work that can be performed more cheaply and deterministically.
+
+Use this preference order:
+
+1. **Program / deterministic harness first.** If behavior can be expressed reliably as ordinary code, schema validation, state transition logic, transformation, retry policy, routing table, or another deterministic mechanism, implement it outside the generative model. This has the lowest execution cost, highest reproducibility, and avoids unnecessary AI nondeterminism.
+2. **Local LLM for soft logic close to the AI boundary.** Some control/interpretation logic is tightly coupled to generated language, contextual intent, or AI outputs and becomes awkward or brittle when forced into a growing rule set. Use a replaceable local model for this layer when its capability is sufficient. The marginal external API cost is effectively zero, and it preserves flexible interpretation without spending frontier-model capacity.
+3. **Codex/frontier model only for genuinely difficult reasoning.** Escalate implementation, review, complex judgment, ambiguous analysis, or other tasks whose semantic difficulty warrants the cost and capability.
+
+This yields a three-layer execution model:
+
+```text
+Hard / deterministic logic -> Program / Harness
+Soft AI-adjacent logic     -> Local LLM
+Deep reasoning             -> Codex / Frontier AI
+```
+
+The layers are not permanent classifications. A useful maturation path is:
+
+```text
+Frontier AI
+  -> repeated pattern becomes understood
+Local LLM
+  -> rules/invariants become stable
+Program / Harness
+```
+
+New or poorly understood work may begin at the high-capability end; operational learning should continuously move stable behavior toward cheaper and more deterministic layers.
+
+The key optimization question is therefore not merely "Can a cheaper model do this?" but first **"Does this require a generative model at all?"** Local LLMs are the preferred middle layer specifically for AI-adjacent soft logic that is expensive or unnatural to externalize as conventional code.
+
+This principle applies beyond Continuation dispatch to TEAI integrations, OpenClaw orchestration, workflow support logic, knowledge processing, and other AI-assisted execution paths. Cost evaluation should include API/model spend, latency, reproducibility, operational complexity, and the engineering cost of prematurely hard-coding unstable behavior.
