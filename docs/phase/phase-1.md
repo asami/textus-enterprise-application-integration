@@ -15,9 +15,15 @@ Enterprise Event を CNCF の管理された実行へ接続し、外部 goal 委
 - Specification discussion: [Minimum TEAI contract](../notes/minimum-teai-integration-contract.md)
 - Interaction vocabulary: [OpenClaw patterns](../notes/openclaw-interaction-patterns.md)
 - Planning history: [2026-10-02 journal](../journal/2026-10-02-phase-1-contract-planning.md)
+- Review follow-up: [採用方針と反映記録](../journal/2026-10-02-phase-1-review-follow-up.md)
+- Normative contract: [teai.minimum-integration.v1](../spec/minimum-teai-integration-contract.md)
+- Design boundaries: [Minimum integration boundaries](../design/minimum-teai-integration-boundaries.md)
+- Canonical checklist reference: [Phase 1 checklist](phase-1-checklist.md)
+- Contract freeze record: [P1-S1-D1 journal](../journal/2026-10-02-phase-1-contract-freeze.md)
 
-仕様案は notes に置き、Stage 1 で design/spec に確定する。この Phase は実装順序と
-checklist を管理する。notes の記載だけで実装・テスト成功を主張しない。
+仕様検討履歴は notes に保持し、P1-03 の最小契約を上記 design/spec に確定した。
+この Phase は実装順序と唯一の inline checklist ledger を管理する。
+文書確定だけで実装・テスト・生成 ABI・runtime 成功や Step closure を主張しない。
 
 ## Boundary
 
@@ -33,6 +39,11 @@ checklist を管理する。notes の記載だけで実装・テスト成功を�
 同じ event の再送、結果の重複、不正な相関、goal failure/cancellation を小さな
 fixture で確認する。起動 Job の完了と Workflow の業務結果を区別する。
 
+初期の ingress/completion/照会は、構成済み source/endpoint を持つ信頼された
+専用テスト harness のみから呼び出し、network へ公開しない。照会・結果提出は
+その source/委譲 work の範囲に限定する。「公開 Operation」は宣言済み component API
+の意味である。外部公開に移る場合は既存 CNCF の主体・認可 policy と拒否試験を先に結び付ける。
+
 実 OpenClaw 接続、LLM 品質、FTP/SFTP/Google Workspace adapter、multi-worker、
 crash/restart を含む end-to-end exactly-once、汎用再送基盤、運用 dashboard は範囲外。
 この Phase の成功は実 CNCF とテスト用 Edge 間の契約実証であり、実 OpenClaw や
@@ -47,8 +58,8 @@ Stage Status:
 
 - [x] P1-01: 固定 gitlink `e25b94e42d3aa58a0af87d42049dae7a8463a26c` の ai/directive を初期化し、root directive links が読める。
 - [x] P1-02: architecture と CNCF の現行 source/spec の対応・差異を仕様検討案に記録した。ソース読取であり実行検証ではない。
-- [ ] P1-03: Event/Binding、四つの interaction、相関、逐次重複、failure model を design/spec に確定し、fixture の型を決めた。
-- [ ] P1-04: 使用する CNCF/Cozy の版、生成 ABI、managed Command → typed Start → completion の公開経路を特定し、Job と Workflow の対応を focused proof で確認した。
+- [x] P1-03: Event/Binding、四つの interaction、呼出し主体と照会範囲、相関、逐次重複、source/event による応答喪失時の照会と起動前後の記録順序を design/spec に確定し、fixture の型を決めた。証拠: [規範契約・fixture 語彙](../spec/minimum-teai-integration-contract.md)、[責務と順序決定](../design/minimum-teai-integration-boundaries.md)。実装・依存/ABI/provider proof は未完了。
+- [ ] P1-04: CNCF/Cozy の source commit・使用 artifact・生成 ABI を区別して記録し、managed Command → typed Start → completion と source/event 照会の宣言済み経路、trusted harness の境界、Job/Workflow 対応を focused proof で確認した。未コミット部分の観測だけを依存版の証拠にしない。
 
 ## Stage 2 — Component foundation and event admission
 
@@ -70,7 +81,7 @@ Stage Status:
 
 - [ ] P1-08: 決定的な文書取得 INVOCATION を ORCHESTRATION で実行し、goal DELEGATION を CNCF WORK_ORDER として返す。
 - [ ] P1-09: suspension/issued request が確定した後に driver が別呼出しで結果を返し、declared completion Operation が同じ WorkflowHandle の Workflow を再開して terminal outcome を返す。
-- [ ] P1-10: 結果の重複、不正 identity/revision/snapshot/type/evidence、Failed/Cancelled outcome、timeout の未確認状態を focused specs で確認する。
+- [ ] P1-10: 結果の重複、不正 identity/revision/snapshot/type/evidence、Failed/Cancelled outcome、開始応答/完了応答の喪失と未確認状態、初期 driver の利用範囲を focused specs で確認する。
 
 ## Stage 4 — Demonstration and acceptance evidence
 
@@ -93,8 +104,16 @@ Stage Status:
 | AC-05 | 確定した WORK_ORDER | driver が別呼出しで正当な結果を返す | 同じ instance identity を保持し、CNCF closing Action を一度実行して終端へ進む |
 | AC-06 | 未完了または処理済み WorkOrder | stale/別 instance/不正型/不足 evidence、または重複結果を送る | 不正・重複処理で Workflow を進めず、claim token を外部へ出さない |
 | AC-07 | 作業失敗または中止の typed result | completion を呼ぶ | 同じ Workflow が定義済み failure/cancel 結果を記録し、業務成功と表示しない |
-| AC-08 | transport timeout または確定状況が不明な応答 | 同じ identity で確認する | 未確認と失敗を区別し、新規 goal/Workflow の自動作成をしない |
+| AC-08 | 応答喪失・未確認の共通要件 | 下記 AC-08a/08b/08c を検証する | 未確認と失敗を区別し、新規 goal/Workflow の自動作成をしない。AC-08 の具体化はこの三例を closure basis とする |
+| AC-08a | 起動・対応記録後の最初の応答を意図的に捨て、driver は Job ID/Handle を持たない | source/event のみで照会し、同じ event を再送する | 元の Job/Workflow に解決し、起動 Job 数・Workflow 数は増えない |
+| AC-08b | closing Action 後の完了応答を意図的に捨てる | source/event・既知の continuation 対応を照会し、結果を再送する | 同じ Workflow の確認済み結果を参照し、closing Action 実行数と Workflow 数は増えない。duplicate 拒否だけで成功と判断しない |
+| AC-08c | 送信後の照会で記録なし・起動結果待ち・結果未確認、または照会不能を観測する | 同じ identity で確認する | 観測を区別して返し、対応の欠落を未実行の証拠として自動再起動しない |
 | AC-09 | 起動 Job が終了し Workflow が中断中 | 状況を照会する | Job 成功を業務完了と表示せず、現在の WorkOrder/Workflow を示す |
+| AC-10 | source/endpoint/work 範囲を固定した trusted harness | 別呼出しで completion と照会を行う | 構成で定めた範囲のみ利用し、payload の主体申告を権限にしない。network 非公開を構成で確認する |
+
+初期範囲外へ公開する場合の追加受入: 無権限主体が正しい result fields を送っても
+既存 CNCF 認可で拒否され、範囲外の照会も許可されない。その後の正当な提出は成功する。
+この追加受入と公開構成の採用が揃うまで、trusted harness の実績を公開 API の認可実証にしない。
 
 Executable specs では Given/When/Then を実際の setup/action/expectation の境界に置く。
 文書文字列や Phase 完了印だけを検査する test は作らない。
@@ -106,6 +125,7 @@ fake Workflow/Job だけの実証、単一呼出し内だけの callback、別 W
 「再開」は完了条件を満たさない。上流 capability が不足する場合は P1-04 など該当項目を
 未完了として具体的な owner/不足契約を記録し、TEAI 内で代替 engine を実装しない。
 
-次の作業は P1-03/P1-04。まず最小 fixture と利用する公開起動・completion 経路を
-確定する。SBT は serialized runner、Cozy は対応 runner を使う。検証用 runtime
+次の未完了項目は P1-04。確定した最小契約を実 dependency artifact と生成 ABI、
+公開起動・completion・照会/store/provider 経路へ結び付けて証明する。
+SBT は serialized runner、Cozy は対応 runner を使う。検証用 runtime
 生成物は `target/` に置き、外部通信や実 OpenClaw 接続を成立したと推測しない。
