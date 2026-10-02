@@ -4,6 +4,16 @@ TEAI is the enterprise application integration layer for Textus.
 
 It connects enterprise events and endpoints to CNCF Operations and Workflows, while allowing workflow steps to delegate non-deterministic work to AI/agent environments through the Continuation Protocol.
 
+## Current development
+
+[Phase 1](docs/phase/phase-1.md) plans the minimum integration contract and one
+event-to-continuation workflow demonstration. The
+[contract discussion](docs/notes/minimum-teai-integration-contract.md) records
+the current CNCF alignment, correlation, duplicate-delivery and failure
+boundaries. Specification freeze, implementation and executable acceptance are
+pending; the first proof uses real CNCF execution with a deterministic external
+edge test driver.
+
 ## Core idea
 
 TEAI treats integration as a bridge between external enterprise endpoints and the CNCF execution model.
