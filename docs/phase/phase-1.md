@@ -129,3 +129,7 @@ fake Workflow/Job だけの実証、単一呼出し内だけの callback、別 W
 公開起動・completion・照会/store/provider 経路へ結び付けて証明する。
 SBT は serialized runner、Cozy は対応 runner を使う。検証用 runtime
 生成物は `target/` に置き、外部通信や実 OpenClaw 接続を成立したと推測しない。
+
+## Follow-on development boundary (2026-11-02)
+
+The secure Integration Component / artifact execution work is **not** silently added to Phase 1 closure. Phase 1 remains the deterministic event-to-continuation proof. Follow-on [secure EAI delivery plan](secure-integration-component-delivery-plan.md) defines staged Docker isolation, CAR qualification, managed artifacts, mail ingestion and mobile direct-upload coordination. Phase 1's existing trusted test driver is not proof of sandbox or public ingress security. See [architecture journal](../journal/2026-11-02-secure-integration-component-architecture.md).
