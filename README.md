@@ -10,8 +10,9 @@ It connects enterprise events and endpoints to CNCF Operations and Workflows, wh
 event-to-continuation workflow demonstration. The
 [contract discussion](docs/notes/minimum-teai-integration-contract.md) records
 the current CNCF alignment, correlation, duplicate-delivery and failure
-boundaries. Specification freeze, implementation and executable acceptance are
-pending; the first proof uses real CNCF execution with a deterministic external
+boundaries. The specification freeze is recorded in the canonical Phase 1
+checklist; implementation and executable acceptance remain pending. The first
+proof uses real CNCF execution with a deterministic external
 edge test driver.
 
 ## Core idea
@@ -218,3 +219,12 @@ DELEGATION:
 ```
 
 This distinction should be reflected in TEAI contracts and mapped consistently to CNCF ORCHESTRATION / CONTINUATION semantics.
+
+## Secure integration delivery plan — 2026-11-02
+
+[Phase 2: Secure EAI Artifact and Provider Integration](docs/phase/phase-2.md)
+formalizes the November 2 proposal. First deliver private mail Excel -> TKL
+Material, then mobile direct upload with EAI-managed Drive sessions. CNCF Phase
+118 owns external execution; TKL owns Material admission; Workbench consumes the
+ordinary TKL reference route. Existing [Phase 1](docs/phase/phase-1.md) remains
+unchanged. The inline EAI2-01..06 checklist tracks planned work, not acceptance.
