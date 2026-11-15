@@ -49,3 +49,8 @@ TEAI should prioritize:
 It should **not** prioritize building a large catalog of SaaS connectors.
 
 This keeps TEAI focused on enterprise integration semantics while allowing OpenClaw to serve as the intelligent integration edge.
+
+## Executable Knowledge alignment (2026-11-16)
+
+Deterministic Endpoint behavior and formalized integration workflows may embody **Executable Knowledge**; Delegation Endpoints remain appropriate where AI inference is intrinsically needed. SECI Externalization/Combination explain the conversion of implicit procedures and composed explicit knowledge into executable assets. TEAI retains authorization, lifecycle, provenance, and execution contracts. Canonical concept and draft contract: [SimpleModeling Executable Knowledge](https://github.com/asami/simplemodelingorg/blob/main/docs/notes/executable-knowledge.md).
+
